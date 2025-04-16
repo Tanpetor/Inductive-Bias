@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 import os
 
 from dataset import MiniImageNetDataset, reorganize_dataset, ReorganizedDataset
-from CNN_model import AttentionEnhancedModel
+from CNN_model_IB import AttentionEnhancedModel
 from train import train_model, test_model, show_examples
 
 
