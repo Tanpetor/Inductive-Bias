@@ -7,11 +7,12 @@ import os
 
 from dataset import MiniImageNetDataset, reorganize_dataset, ReorganizedDataset
 from CNN_model_IB import AttentionEnhancedModel
+from CNN_model import BasicBlockNet
 from train import train_model, test_model, show_examples
 
 
 def main():
-    device = torch.device('mps')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     img_size = 64
     transform = transforms.Compose([
@@ -21,7 +22,7 @@ def main():
                              std=[0.229, 0.224, 0.225])
     ])
 
-    mini_imagenet_path = '/Users/tanpeter/Desktop/Inductive_Bias/CNN_minMNIST/archive/'
+    mini_imagenet_path = 'autodl-tmp/archive/'
 
     try:
         train_dataset = MiniImageNetDataset(
@@ -80,13 +81,15 @@ def main():
 
     model = AttentionEnhancedModel()
     criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
-    optimizer = optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
+    optimizer = optim.AdamW(model.parameters(), lr=0.001, weight_decay=1e-5)
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=3, verbose=True)
 
-    model = train_model(model, new_train_loader, new_val_loader, criterion, optimizer, num_epochs=20, device=device)
+    model = train_model(model, new_train_loader, new_val_loader, criterion, optimizer, num_epochs=1, device=device)
 
     best_model = AttentionEnhancedModel()
-    best_model = torch.load('best_model_IB_1.pth', map_location=device)
+    best_model = torch.load(
+        'autodl-tmp/best_model_IB_1.pth',
+        map_location=device, weights_only=False)
     test_model(best_model, new_test_loader, criterion, all_classes, device=device)
 
     show_examples(best_model, new_test_dataset, all_classes, n_examples=9, device=device)

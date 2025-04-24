@@ -181,7 +181,7 @@ def train_15class_model(model, train_loader, val_loader, criterion, optimizer, n
     plt.legend()
 
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
     print(classification_report(all_labels, all_preds, target_names=class_names, digits=3))
 

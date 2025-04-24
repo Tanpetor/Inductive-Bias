@@ -4,9 +4,13 @@ import torch.optim as optim
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report
+import numpy as np
+import copy
 
 
-def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=25, device='mps'):
+def train_model(model, train_loader, val_loader, criterion, optimizer, num_epochs=25, device='mps', par_search=""):
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     model = model.to(device)
     train_losses, val_losses = [], []
     train_accs, val_accs = [], []
@@ -75,7 +79,7 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
-            torch.save(model, 'best_model_IB_1.pth')
+            best_model = copy.deepcopy(model)
 
         print(f'\nEpoch {epoch + 1}/{num_epochs}: '
               f'Train Loss: {train_loss:.4f}, Train Acc: {train_acc:.2f}% | '
@@ -97,12 +101,14 @@ def train_model(model, train_loader, val_loader, criterion, optimizer, num_epoch
     plt.legend()
 
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
-    return model
+    return best_model, train_losses, val_losses, train_accs, val_accs
 
 
 def test_model(model, test_loader, criterion, all_classes, device='mps'):
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     model = model.to(device)
     model.eval()
 
@@ -167,6 +173,8 @@ def test_model(model, test_loader, criterion, all_classes, device='mps'):
 
 
 def show_examples(model, dataset, all_classes, n_examples=9, device='mps'):
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     model.eval()
     indices = np.random.choice(len(dataset), n_examples)
 
@@ -196,4 +204,4 @@ def show_examples(model, dataset, all_classes, n_examples=9, device='mps'):
         plt.axis('off')
 
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)

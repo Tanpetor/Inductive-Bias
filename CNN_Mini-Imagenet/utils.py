@@ -5,6 +5,9 @@ import torch
 
 def visualize_attention(model, image, device='mps'):
 
+    device = torch.device(
+        "cuda" if torch.cuda.is_available() else "cpu")
+
     model.eval()
     img_tensor = image.unsqueeze(0).to(device)
 
@@ -39,7 +42,7 @@ def visualize_attention(model, image, device='mps'):
         axs[i + 1].axis('off')
 
     plt.tight_layout()
-    plt.show()
+    plt.show(block=False)
 
 
 def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues):
@@ -71,4 +74,4 @@ def plot_confusion_matrix(y_true, y_pred, classes, normalize=False, title=None, 
     plt.tight_layout()
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
-    plt.show()
+    plt.show(block=False)
