@@ -1,0 +1,4 @@
+IMAGE_SIZE = (128, 128)
+NUM_CLASSES = 101
+EPOCHS = 100
+device = 'mps'
